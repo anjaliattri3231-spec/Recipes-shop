@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Recipes Store</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial;
+    background: #f4f4f4;
+    text-align: center;
+}
+
+/* Navbar */
+.navbar {
+    background: darkblue;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 30px;
+}
+
+.navbar ul {
+    display: flex;
+    list-style: none;
+}
+
+.navbar ul li {
+    margin-left: 20px;
+}
+
+.navbar ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+/* Cards */
+#recipes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.card {
+    background: white;
+    width: 250px;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px gray;
+}
+
+img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+button {
+    padding: 8px 12px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-btn {
+    background: green;
+    color: white;
+}
+
+#buyBtn {
+    background: orange;
+    color: white;
+    margin-top: 15px;
+}
+
+/* Cart & Bill */
+#cart, #bill {
+    background: white;
+    margin: 15px;
+    padding: 10px;
+}
+
+/* Popup */
+.popup {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: green;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    display: none;
+}
+
+/* Footer */
+.footer {
+    background: darkblue;
+    color: white;
+    padding: 15px;
+    margin-top: 30px;
+}
+</style>
+
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <h2>🍽 Recipes Store</h2>
+    <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#cart">Cart</a></li>
+        <li><a href="#footer">Contact</a></li>
+    </ul>
+</nav>
+
+<h1>Welcome to Recipes Store</h1>
+
+<div id="recipes"></div>
+
+<h2>🛒 Cart</h2>
+<div id="cart"></div>
+
+<button id="buyBtn" onclick="checkout()">Buy Now</button>
+
+<h2>🧾 Bill</h2>
+<div id="bill"></div>
+
+<!-- Popup -->
+<div id="popup" class="popup">Item added</div>
+
+<!-- Footer -->
+<footer class="footer" id="footer">
+    <p>© 2026 Recipes Store</p>
+</footer>
+
+<script>
+let cart = [];
+
+// Fetch recipes
+fetch("https://dummyjson.com/recipes")
+.then(res => res.json())
+.then(data => {
+    let container = document.getElementById("recipes");
+
+    data.recipes.forEach(recipe => {
+        let price = Math.floor(Math.random() * 500) + 100;
+
+        let card = document.createElement("div");
+        card.classList.add("card");
+
+        card.innerHTML = `
+            <h3>${recipe.name}</h3>
+            <img src="${recipe.image}">
+            <p>Cuisine: ${recipe.cuisine}</p>
+            <p>Price: ₹${price}</p>
+            <button class="add-btn" onclick="addToCart('${recipe.name}', ${price})">
+                Add to Cart
+            </button>
+        `;
+
+        container.appendChild(card);
+    });
+});
+
+// Add to Cart
+function addToCart(name, price) {
+    cart.push({ name, price });
+    displayCart();
+    showPopup(name);
+}
+
+// Display Cart
+function displayCart() {
+    let cartDiv = document.getElementById("cart");
+    cartDiv.innerHTML = "";
+
+    cart.forEach(item => {
+        let p = document.createElement("p");
+        p.innerText = item.name + " - ₹" + item.price;
+        cartDiv.appendChild(p);
+    });
+}
+
+// Checkout
+function checkout() {
+    if(cart.length === 0){
+        alert("Cart is empty!");
+        return;
+    }
+
+    let billDiv = document.getElementById("bill");
+    billDiv.innerHTML = "";
+
+    let total = 0;
+
+    cart.forEach(item => {
+        let p = document.createElement("p");
+        p.innerText = item.name + " - ₹" + item.price;
+        billDiv.appendChild(p);
+        total += item.price;
+    });
+
+    let totalText = document.createElement("h3");
+    totalText.innerText = "Total = ₹" + total;
+    billDiv.appendChild(totalText);
+}
+
+// Popup
+function showPopup(name) {
+    let popup = document.getElementById("popup");
+    popup.innerText = name + " added to cart";
+    popup.style.display = "block";
+
+    setTimeout(() => {
+        popup.style.display = "none";
+    }, 2000);
+}
+</script>
+
+</body>
+</html>
